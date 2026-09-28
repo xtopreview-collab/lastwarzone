@@ -1,0 +1,40 @@
+backend:
+  name: github
+  repo: xtopreview-collab/lastwarzone
+  branch: main
+
+media_folder: public/images
+public_folder: /images
+
+collections:
+  - name: guides-vi
+    label: "📚 Hướng Dẫn (Tiếng Việt)"
+    folder: src/content/guides/vi
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: "Tiêu đề", name: title, widget: string }
+      - { label: "Mô tả", name: description, widget: string }
+      - { label: "Danh mục", name: category, widget: select, options: ["combat", "heroes", "buildings", "gear", "resources", "seasons", "decorations"] }
+      - { label: "Thứ tự", name: order, widget: number, default: 0 }
+      - { label: "Tags", name: tags, widget: list, default: [] }
+      - { label: "Cập nhật lần cuối", name: lastUpdated, widget: string, default: "2026-09-28" }
+      - { label: "Nguồn", name: source, widget: string, required: false }
+      - { label: "Nội dung", name: body, widget: markdown }
+
+  - name: guides-en
+    label: "📚 Guides (English)"
+    folder: src/content/guides/en
+    create: true
+    slug: "{{slug}}"
+    extension: md
+    fields:
+      - { label: "Title", name: title, widget: string }
+      - { label: "Description", name: description, widget: string }
+      - { label: "Category", name: category, widget: select, options: ["combat", "heroes", "buildings", "gear", "resources", "seasons", "decorations"] }
+      - { label: "Order", name: order, widget: number, default: 0 }
+      - { label: "Tags", name: tags, widget: list, default: [] }
+      - { label: "Last Updated", name: lastUpdated, widget: string, default: "2026-09-28" }
+      - { label: "Source", name: source, widget: string, required: false }
+      - { label: "Content", name: body, widget: markdown }

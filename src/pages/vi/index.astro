@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const guides = await getCollection('guides', ({ id }) => id.startsWith('vi/'));
+
+const categories = [
+  { id: 'combat', icon: '⚔️', name: 'Chiến Đấu', desc: 'Cơ chế chiến đấu, PvP, đội hình' },
+  { id: 'heroes', icon: '🦸', name: 'Tướng', desc: 'Tier list, build tướng, kỹ năng' },
+  { id: 'buildings', icon: '🏗️', name: 'Công Trình', desc: 'HQ, Tech Centre, lộ trình phát triển' },
+  { id: 'gear', icon: '🛡️', name: 'Trang Bị', desc: 'Mythic gear, EW, upgrade path' },
+  { id: 'resources', icon: '💎', name: 'Tài Nguyên', desc: 'VIP, gem, pack, shop' },
+  { id: 'seasons', icon: '🏆', name: 'Mùa Giải', desc: 'VS Duel, SvS, Alliance' },
+  { id: 'decorations', icon: '🏛️', name: 'Trang Trí', desc: 'Decoration gallery, buff, tier list' },
+];
+---
+
+<BaseLayout title="Hướng Dẫn Last War Survival" lang="vi">
+  <!-- Hero Section -->
+  <section class="text-center py-12 md:py-20">
+    <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-4">
+      Last War <span class="text-dark-accent">Zone</span>
+    </h1>
+    <p class="text-lg md:text-xl text-dark-muted max-w-2xl mx-auto mb-8">
+      Hướng dẫn chiến thuật toàn diện cho Last War: Survival Game.
+      <br />Từ cơ bản đến nâng cao, cập nhật Season 3.
+    </p>
+    <a
+      href="/vi/guides/"
+      class="inline-flex items-center gap-2 rounded-xl bg-dark-accent px-6 py-3 text-sm font-bold text-black hover:bg-dark-accent-hover transition-colors"
+    >
+      📚 Xem Hướng Dẫn
+    </a>
+  </section>
+
+  <!-- Categories Grid -->
+  <section class="py-8">
+    <h2 class="text-2xl font-bold text-white mb-6">📂 Danh Mục</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {categories.map((cat) => (
+        <a
+          href={`/vi/guides/#${cat.id}`}
+          class="group flex items-start gap-4 rounded-xl border border-dark-border bg-dark-card p-5 hover:border-dark-accent transition-all"
+        >
+          <span class="text-3xl">{cat.icon}</span>
+          <div>
+            <h3 class="font-semibold text-white group-hover:text-dark-accent transition-colors">{cat.name}</h3>
+            <p class="text-sm text-dark-muted mt-1">{cat.desc}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="py-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="rounded-xl border border-dark-border bg-dark-card p-5 text-center">
+        <div class="text-3xl font-bold text-dark-accent">37+</div>
+        <div class="text-sm text-dark-muted mt-1">Bài Hướng Dẫn</div>
+      </div>
+      <div class="rounded-xl border border-dark-border bg-dark-card p-5 text-center">
+        <div class="text-3xl font-bold text-dark-accent">S3</div>
+        <div class="text-sm text-dark-muted mt-1">Season Mới Nhất</div>
+      </div>
+      <div class="rounded-xl border border-dark-border bg-dark-card p-5 text-center">
+        <div class="text-3xl font-bold text-dark-accent">🇻🇳</div>
+        <div class="text-sm text-dark-muted mt-1">Tiếng Việt</div>
+      </div>
+      <div class="rounded-xl border border-dark-border bg-dark-card p-5 text-center">
+        <div class="text-3xl font-bold text-dark-accent">Free</div>
+        <div class="text-sm text-dark-muted mt-1">Miễn Phí 100%</div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

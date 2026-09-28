@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-dark-bg text-dark-text;
+  }
+
+  /* Typography plugin dark overrides */
+  .prose {
+    @apply text-dark-text;
+  }
+  .prose h1, .prose h2, .prose h3, .prose h4 {
+    @apply text-white font-bold;
+  }
+  .prose a {
+    @apply text-dark-accent hover:text-dark-accent-hover;
+  }
+  .prose strong {
+    @apply text-white;
+  }
+  .prose code {
+    @apply bg-dark-card text-dark-accent px-1.5 py-0.5 rounded text-sm;
+  }
+  .prose pre {
+    @apply bg-dark-card border border-dark-border;
+  }
+  .prose table {
+    @apply w-full;
+  }
+  .prose th {
+    @apply bg-dark-card text-dark-accent border-dark-border;
+  }
+  .prose td {
+    @apply border-dark-border;
+  }
+  .prose tr {
+    @apply border-dark-border;
+  }
+  .prose blockquote {
+    @apply border-dark-accent text-dark-muted;
+  }
+  .prose hr {
+    @apply border-dark-border;
+  }
+  .prose li::marker {
+    @apply text-dark-accent;
+  }
+}
