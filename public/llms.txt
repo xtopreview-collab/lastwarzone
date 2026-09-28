@@ -1,0 +1,42 @@
+# LastWarZone.com
+
+> The ultimate Last War: Survival Game strategy guide — bilingual EN/VI
+
+## About
+LastWarZone is a free, community-driven strategy guide for Last War: Survival Game (by FunFly PTE. LTD.). We cover hero tier lists, combat mechanics, gear systems, and base progression. Updated for Season 3+ meta.
+
+## Key Facts
+- Last War has 114M+ total downloads and 3.8M monthly active users (Sept 2026)
+- Top markets: US (30-35%), Japan (15-20%), Korea (10-12%), Vietnam (est. 50-150K MAU)
+- The damage formula: Damage = Base × 4000/(Defense+4000)
+- Effective HP formula: EHP = HP × (Defense+4000)/4000
+- Mono-squad (5 same type) grants +20% HP/ATK/DEF bonus
+- Type triangle: Aircraft > Tank > Missile > Aircraft (+20% damage bonus)
+- Damage Reduction has a 75% hard cap
+- Kimberly is the #1 ranked hero across all community tier lists
+- Exclusive Weapon Level 20 grants +7.5% squad-wide HP/ATK/DEF
+- 10 Mythic (Red) Blueprints required per Mythic gear piece
+- Mythic Radar passive: -30% incoming Critical Hit Damage
+
+## Site Structure
+- /en/ — English guides and strategy content
+- /vi/ — Vietnamese guides (Hướng dẫn tiếng Việt)
+- /en/guides/ — All English guide articles
+- /vi/guides/ — All Vietnamese guide articles
+
+## Content Categories
+- Heroes & Squad Building — Tier lists, hero builds, squad compositions
+- Combat Mechanics — Damage formulas, type advantage, formation positioning
+- Gear & Equipment — Mythic gear, Exclusive Weapons, upgrade paths
+- Base Development — HQ progression, Tech Centre, building priority
+- Resources — Gem economy, pack tier lists, VIP optimization
+- Seasons & Events — Season meta, SvS strategy, event guides
+- Decorations — Decoration tier list, buff guide
+
+## Languages
+- English (en)
+- Vietnamese (vi)
+
+## Contact
+- Website: https://lastwarzone.com
+- GitHub: https://github.com/xtopreview-collab/lastwarzone

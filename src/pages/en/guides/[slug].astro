@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 export async function getStaticPaths() {
   const guides = await getCollection('guides', ({ id }) => id.startsWith('en/'));
   return guides.map((guide) => ({
-    params: { slug: guide.id.replace('en/', '') },
+    params: { slug: guide.id.replace('en/', '').replace('.md', '').replace(/_/g, '-') },
     props: { guide },
   }));
 }

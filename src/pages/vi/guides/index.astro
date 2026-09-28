@@ -35,7 +35,7 @@ allGuides.forEach((guide) => {
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           {cat.guides.sort((a, b) => a.data.order - b.data.order).map((guide) => {
-            const slug = guide.id.replace('vi/', '');
+            const slug = guide.id.replace('vi/', '').replace('.md', '').replace(/_/g, '-');
             return (
               <a
                 href={`/vi/guides/${slug}/`}
