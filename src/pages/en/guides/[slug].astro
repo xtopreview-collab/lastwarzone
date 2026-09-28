@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides', ({ id }) => id.startsWith('en/'));
+  return guides.map((guide) => ({
+    params: { slug: guide.id.replace('en/', '') },
+    props: { guide },
+  }));
+}
+
+const { guide } = Astro.props;
+const { Content } = await guide.render();
+---
+
+<BaseLayout title={guide.data.title} description={guide.data.description} lang="en">
+  <article class="max-w-4xl mx-auto">
+    <nav class="flex items-center gap-2 text-sm text-dark-muted mb-6">
+      <a href="/en/" class="hover:text-white">Home</a>
+      <span>›</span>
+      <a href="/en/guides/" class="hover:text-white">Guides</a>
+      <span>›</span>
+      <span class="text-dark-accent">{guide.data.title}</span>
+    </nav>
+
+    <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-4">{guide.data.title}</h1>
+
+    {guide.data.description && (
+      <p class="text-dark-muted text-lg mb-6">{guide.data.description}</p>
+    )}
+
+    {guide.data.tags && guide.data.tags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-8">
+        {guide.data.tags.map((tag: string) => (
+          <span class="rounded-full bg-dark-card border border-dark-border px-3 py-1 text-xs text-dark-muted">
+            {tag}
+          </span>
+        ))}
+      </div>
+    )}
+
+    <div class="prose prose-invert max-w-none">
+      <Content />
+    </div>
+
+    {guide.data.source && (
+      <div class="mt-8 rounded-lg border border-dark-border bg-dark-card p-4 text-sm text-dark-muted">
+        📋 Source: <a href={guide.data.source} target="_blank" class="text-dark-link hover:underline">{guide.data.source}</a>
+      </div>
+    )}
+  </article>
+</BaseLayout>

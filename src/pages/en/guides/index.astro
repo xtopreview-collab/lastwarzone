@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const allGuides = await getCollection('guides', ({ id }) => id.startsWith('en/'));
+
+const categoryMap: Record<string, { icon: string; name: string; guides: typeof allGuides }> = {
+  combat: { icon: '⚔️', name: 'Combat & PvP', guides: [] },
+  heroes: { icon: '🦸', name: 'Heroes', guides: [] },
+  buildings: { icon: '🏗️', name: 'Base Development', guides: [] },
+  gear: { icon: '🛡️', name: 'Gear & Equipment', guides: [] },
+  resources: { icon: '💎', name: 'Resources', guides: [] },
+  seasons: { icon: '🏆', name: 'Seasons & Events', guides: [] },
+  decorations: { icon: '🏛️', name: 'Decorations', guides: [] },
+};
+
+allGuides.forEach((guide) => {
+  const cat = guide.data.category || 'combat';
+  if (categoryMap[cat]) {
+    categoryMap[cat].guides.push(guide);
+  }
+});
+---
+
+<BaseLayout title="All Guides" lang="en">
+  <h1 class="text-3xl font-bold text-white mb-8">📚 All Guides</h1>
+
+  {Object.entries(categoryMap).map(([catId, cat]) => (
+    cat.guides.length > 0 && (
+      <section id={catId} class="mb-12">
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <span>{cat.icon}</span>
+          <span>{cat.name}</span>
+          <span class="text-sm font-normal text-dark-muted">({cat.guides.length})</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {cat.guides.sort((a, b) => a.data.order - b.data.order).map((guide) => {
+            const slug = guide.id.replace('en/', '');
+            return (
+              <a
+                href={`/en/guides/${slug}/`}
+                class="group flex items-center gap-3 rounded-lg border border-dark-border bg-dark-card px-4 py-3 hover:border-dark-accent transition-all"
+              >
+                <span class="text-dark-accent">▸</span>
+                <div>
+                  <h3 class="font-medium text-white group-hover:text-dark-accent transition-colors text-sm">
+                    {guide.data.title}
+                  </h3>
+                  {guide.data.description && (
+                    <p class="text-xs text-dark-muted mt-0.5 line-clamp-1">{guide.data.description}</p>
+                  )}
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </section>
+    )
+  ))}
+</BaseLayout>
