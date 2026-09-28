@@ -4,70 +4,294 @@ import { getCollection } from 'astro:content';
 
 const guides = await getCollection('guides', ({ id }) => id.startsWith('en/'));
 
-const categories = [
-  { id: 'combat', icon: '⚔️', name: 'Combat & PvP', desc: 'Damage formulas, squad synergy, PvP strategy' },
-  { id: 'heroes', icon: '🦸', name: 'Heroes', desc: 'Tier lists, hero builds, squad compositions' },
-  { id: 'buildings', icon: '🏗️', name: 'Base Development', desc: 'HQ progression, Tech Centre, building priority' },
-  { id: 'gear', icon: '🛡️', name: 'Gear & Equipment', desc: 'Mythic gear, Exclusive Weapons, upgrade paths' },
-  { id: 'resources', icon: '💎', name: 'Resources', desc: 'Gems, packs, VIP, resource management' },
-  { id: 'seasons', icon: '🏆', name: 'Seasons & Events', desc: 'VS Duel, SvS, Alliance, event guides' },
-  { id: 'decorations', icon: '🏛️', name: 'Decorations', desc: 'Decoration gallery, buffs, tier list' },
+// Wiki-style category tree
+const wikiTree = [
+  {
+    id: 'getting-started',
+    icon: '🚀',
+    name: 'Getting Started',
+    desc: 'New to Last War? Start here.',
+    keywords: ['beginner', 'new-player', 'f2p'],
+    subcategories: []
+  },
+  {
+    id: 'heroes',
+    icon: '🦸',
+    name: 'Heroes & Squads',
+    desc: 'Tier lists, hero builds, squad compositions',
+    keywords: [],
+    subcategories: [
+      { name: 'Tier Lists', filter: (g: any) => g.data.tags?.includes('tier-list') },
+      { name: 'Tank Heroes', filter: (g: any) => g.data.title?.toLowerCase().includes('tank') },
+      { name: 'Aircraft Heroes', filter: (g: any) => g.data.title?.toLowerCase().includes('aircraft') },
+      { name: 'Missile Heroes', filter: (g: any) => g.data.title?.toLowerCase().includes('missile') },
+      { name: 'Squad Building', filter: (g: any) => g.data.tags?.includes('squad') || g.data.title?.toLowerCase().includes('squad') },
+    ]
+  },
+  {
+    id: 'combat',
+    icon: '⚔️',
+    name: 'Combat & PvP',
+    desc: 'Damage formulas, formations, PvP strategy',
+    keywords: [],
+    subcategories: [
+      { name: 'Mechanics', filter: (g: any) => g.data.tags?.includes('formulas') || g.data.tags?.includes('mechanics') },
+      { name: 'PvP Guides', filter: (g: any) => g.data.tags?.includes('pvp') },
+      { name: 'VS Duel', filter: (g: any) => g.data.title?.toLowerCase().includes('vs') },
+      { name: 'SvS & Alliance', filter: (g: any) => g.data.title?.toLowerCase().includes('svs') || g.data.title?.toLowerCase().includes('alliance') },
+    ]
+  },
+  {
+    id: 'gear',
+    icon: '🛡️',
+    name: 'Gear & Equipment',
+    desc: 'Mythic gear, Exclusive Weapons, crafting paths',
+    keywords: [],
+    subcategories: [
+      { name: 'Gear System', filter: (g: any) => g.data.tags?.includes('gear') },
+      { name: 'Exclusive Weapons', filter: (g: any) => g.data.title?.toLowerCase().includes('exclusive') || g.data.title?.toLowerCase().includes('ew') },
+      { name: 'Mythic Gear', filter: (g: any) => g.data.title?.toLowerCase().includes('mythic') },
+    ]
+  },
+  {
+    id: 'base',
+    icon: '🏗️',
+    name: 'Base & Progression',
+    desc: 'HQ upgrades, Tech Centre, building priority',
+    keywords: [],
+    subcategories: [
+      { name: 'HQ Guide', filter: (g: any) => g.data.title?.toLowerCase().includes('hq') || g.data.title?.toLowerCase().includes('headquarters') },
+      { name: 'Buildings', filter: (g: any) => g.data.category === 'buildings' },
+      { name: 'Tech Centre', filter: (g: any) => g.data.title?.toLowerCase().includes('tech') },
+    ]
+  },
+  {
+    id: 'resources',
+    icon: '💎',
+    name: 'Resources & Economy',
+    desc: 'Gems, packs, VIP, gold bricks',
+    keywords: [],
+    subcategories: [
+      { name: 'Resource Guides', filter: (g: any) => g.data.category === 'resources' },
+      { name: 'Pack Rankings', filter: (g: any) => g.data.title?.toLowerCase().includes('pack') },
+      { name: 'VIP', filter: (g: any) => g.data.title?.toLowerCase().includes('vip') },
+    ]
+  },
+  {
+    id: 'seasons',
+    icon: '🏆',
+    name: 'Seasons & Events',
+    desc: 'Season guides, event strategies, rewards',
+    keywords: [],
+    subcategories: [
+      { name: 'Season Overviews', filter: (g: any) => g.data.title?.toLowerCase().includes('season') },
+      { name: 'Events', filter: (g: any) => g.data.title?.toLowerCase().includes('event') },
+    ]
+  },
+  {
+    id: 'decorations',
+    icon: '🏛️',
+    name: 'Decorations',
+    desc: 'Decoration buffs, tier list, upgrade guide',
+    keywords: [],
+    subcategories: []
+  },
 ];
+
+// Assign guides to categories
+function getGuideCategory(guide: any) {
+  const cat = guide.data.category || '';
+  const tags = guide.data.tags || [];
+  const title = (guide.data.title || '').toLowerCase();
+
+  if (tags.includes('beginner') || tags.includes('new-player') || tags.includes('f2p') || title.includes('getting started')) return 'getting-started';
+  if (cat === 'heroes' || tags.includes('heroes') || tags.includes('tier-list')) return 'heroes';
+  if (cat === 'combat' || tags.includes('combat') || tags.includes('pvp')) return 'combat';
+  if (cat === 'gear' || tags.includes('gear')) return 'gear';
+  if (cat === 'buildings') return 'base';
+  if (cat === 'resources') return 'resources';
+  if (cat === 'seasons' || tags.includes('seasons')) return 'seasons';
+  if (cat === 'decorations') return 'decorations';
+  return 'base';
+}
+
+const categorizedGuides: Record<string, typeof guides> = {};
+wikiTree.forEach(cat => { categorizedGuides[cat.id] = []; });
+
+guides.forEach(guide => {
+  const catId = getGuideCategory(guide);
+  if (categorizedGuides[catId]) {
+    categorizedGuides[catId].push(guide);
+  }
+});
 ---
 
-<BaseLayout title="Last War Survival Guide" lang="en">
-  <section class="text-center py-12 md:py-20">
-    <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-4">
-      Last War <span class="text-dark-accent">Zone</span>
-    </h1>
-    <p class="text-lg md:text-xl text-dark-muted max-w-2xl mx-auto mb-8">
-      The ultimate strategy guide for Last War: Survival Game.
-      <br />From beginner tips to endgame meta — updated for Season 3.
-    </p>
-    <a
-      href="/en/guides/"
-      class="inline-flex items-center gap-2 rounded-xl bg-dark-accent px-6 py-3 text-sm font-bold text-black hover:bg-dark-accent-hover transition-colors"
-    >
-      📚 Browse Guides
-    </a>
-  </section>
+<BaseLayout title="Last War Strategy Wiki" lang="en" description="The ultimate Last War: Survival Game wiki — hero guides, combat formulas, gear systems, and more.">
 
-  <section class="py-8">
-    <h2 class="text-2xl font-bold text-white mb-6">📂 Categories</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {categories.map((cat) => (
-        <a
-          href={`/en/guides/#${cat.id}`}
-          class="group flex items-start gap-4 rounded-xl border border-dark-border bg-dark-card p-5 hover:border-dark-accent transition-all"
-        >
-          <span class="text-3xl">{cat.icon}</span>
-          <div>
-            <h3 class="font-semibold text-white group-hover:text-dark-accent transition-colors">{cat.name}</h3>
-            <p class="text-sm text-dark-muted mt-1">{cat.desc}</p>
-          </div>
+  <!-- Hero Section -->
+  <section class="text-center py-12 md:py-20 relative">
+    <div class="absolute inset-0 bg-gradient-to-b from-dark-accent/5 to-transparent rounded-3xl"></div>
+    <div class="relative">
+      <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-4 tracking-tight">
+        Last War <span class="text-dark-accent">Zone</span>
+      </h1>
+      <p class="text-lg md:text-xl text-dark-muted max-w-2xl mx-auto mb-6">
+        The free strategy wiki for Last War: Survival Game.
+        <br />Updated for <span class="text-dark-accent font-semibold">Season 3</span> meta.
+      </p>
+
+      <!-- Quick Stats -->
+      <div class="flex flex-wrap justify-center gap-4 mb-8">
+        <div class="flex items-center gap-2 bg-dark-card border border-dark-border rounded-full px-4 py-2 text-sm">
+          <span class="text-dark-accent font-bold">{guides.length}+</span>
+          <span class="text-dark-muted">Guides</span>
+        </div>
+        <div class="flex items-center gap-2 bg-dark-card border border-dark-border rounded-full px-4 py-2 text-sm">
+          <span>🇬🇧🇻🇳</span>
+          <span class="text-dark-muted">EN + VI</span>
+        </div>
+        <div class="flex items-center gap-2 bg-dark-card border border-dark-border rounded-full px-4 py-2 text-sm">
+          <span class="text-dark-accent font-bold">S3</span>
+          <span class="text-dark-muted">Updated</span>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="flex flex-wrap justify-center gap-3">
+        <a href="/en/guides/getting-started/" class="inline-flex items-center gap-2 rounded-xl bg-dark-accent px-6 py-3 text-sm font-bold text-black hover:bg-dark-accent-hover transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-dark-accent/20">
+          🚀 New Player? Start Here
         </a>
-      ))}
+        <a href="#wiki" class="inline-flex items-center gap-2 rounded-xl border border-dark-border bg-dark-card px-6 py-3 text-sm font-medium text-white hover:border-dark-accent transition-all">
+          📚 Browse Wiki
+        </a>
+      </div>
     </div>
   </section>
 
+  <!-- Featured Guides -->
   <section class="py-8">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-      <div class="rounded-xl border border-dark-border bg-dark-card p-5 text-center">
-        <div class="text-3xl font-bold text-dark-accent">50+</div>
-        <div class="text-sm text-dark-muted mt-1">In-Depth Guides</div>
+    <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+      <span>🔥</span> Most Popular
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <a href="/en/guides/hero-tier-list/" class="group relative overflow-hidden rounded-xl border border-dark-border bg-dark-card p-5 hover:border-dark-accent transition-all">
+        <img src="/images/heroes/hero-tier-list-2026.webp" alt="Hero Tier List 2026" class="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" />
+        <div class="relative">
+          <span class="text-xs text-dark-accent font-semibold uppercase tracking-wider">Heroes</span>
+          <h3 class="text-white font-bold mt-1 group-hover:text-dark-accent transition-colors">Hero Tier List — S3-6 Meta</h3>
+          <p class="text-xs text-dark-muted mt-2">Complete rankings for all Tank, Aircraft, and Missile heroes</p>
+        </div>
+      </a>
+      <a href="/en/guides/combat-mechanics/" class="group relative overflow-hidden rounded-xl border border-dark-border bg-dark-card p-5 hover:border-dark-accent transition-all">
+        <img src="/images/combat/combat-squad-lineups-guide.webp" alt="Combat Guide" class="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" />
+        <div class="relative">
+          <span class="text-xs text-dark-accent font-semibold uppercase tracking-wider">Combat</span>
+          <h3 class="text-white font-bold mt-1 group-hover:text-dark-accent transition-colors">Combat Mechanics & Formulas</h3>
+          <p class="text-xs text-dark-muted mt-2">The math behind damage, EHP, and formations</p>
+        </div>
+      </a>
+      <a href="/en/guides/getting-started/" class="group relative overflow-hidden rounded-xl border border-dark-border bg-dark-card p-5 hover:border-dark-accent transition-all">
+        <img src="/images/buildings/building-headquarters-art.png" alt="Getting Started" class="absolute inset-0 w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" />
+        <div class="relative">
+          <span class="text-xs text-dark-accent font-semibold uppercase tracking-wider">Beginner</span>
+          <h3 class="text-white font-bold mt-1 group-hover:text-dark-accent transition-colors">Getting Started Guide</h3>
+          <p class="text-xs text-dark-muted mt-2">Your first 14 days — don't waste resources</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Wiki Tree -->
+  <section id="wiki" class="py-8">
+    <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+      📖 Wiki Directory
+    </h2>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {wikiTree.map((cat) => {
+        const catGuides = categorizedGuides[cat.id] || [];
+        return (
+          <div class="rounded-xl border border-dark-border bg-dark-card p-5">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="text-2xl">{cat.icon}</span>
+              <div>
+                <h3 class="font-bold text-white">{cat.name}</h3>
+                <p class="text-xs text-dark-muted">{cat.desc}</p>
+              </div>
+              <span class="ml-auto text-xs bg-dark-bg rounded-full px-2 py-1 text-dark-muted">{catGuides.length}</span>
+            </div>
+            {catGuides.length > 0 ? (
+              <ul class="space-y-1 border-t border-dark-border pt-3">
+                {catGuides.sort((a, b) => (a.data.order || 99) - (b.data.order || 99)).map((guide) => {
+                  const slug = guide.id.replace('en/', '').replace('.md', '').replace(/_/g, '-');
+                  return (
+                    <li>
+                      <a href={`/en/guides/${slug}/`} class="flex items-center gap-2 py-1.5 px-2 rounded-lg text-sm text-dark-muted hover:text-white hover:bg-dark-bg/50 transition-all group">
+                        <span class="text-dark-accent opacity-50 group-hover:opacity-100">▸</span>
+                        <span class="truncate">{guide.data.title}</span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p class="text-xs text-dark-muted italic border-t border-dark-border pt-3">Coming soon...</p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- Key Stats / Quick Reference -->
+  <section class="py-8">
+    <h2 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+      ⚡ Quick Reference
+    </h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="rounded-xl border border-dark-border bg-dark-card p-5">
+        <h3 class="text-sm font-semibold text-dark-accent mb-3">📐 Core Formulas</h3>
+        <div class="space-y-2 text-sm text-dark-muted">
+          <div><span class="text-white font-mono text-xs">DMG = Base × 4000/(DEF+4000)</span></div>
+          <div><span class="text-white font-mono text-xs">EHP = HP × (DEF+4000)/4000</span></div>
+          <div>Mono-squad: <span class="text-dark-accent">+20%</span> HP/ATK/DEF</div>
+          <div>Type advantage: <span class="text-dark-accent">±20%</span> damage</div>
+          <div>DR cap: <span class="text-dark-accent">75%</span></div>
+        </div>
       </div>
-      <div class="rounded-xl border border-dark-border bg-dark-card p-5 text-center">
-        <div class="text-3xl font-bold text-dark-accent">S3</div>
-        <div class="text-sm text-dark-muted mt-1">Latest Season</div>
+      <div class="rounded-xl border border-dark-border bg-dark-card p-5">
+        <h3 class="text-sm font-semibold text-dark-accent mb-3">🔄 Type Triangle</h3>
+        <div class="text-center py-2">
+          <img src="/images/combat/combat-troop-type-counter-triangle.png" alt="Type Counter Triangle" class="inline-block max-h-24 mx-auto" />
+        </div>
+        <div class="text-xs text-dark-muted space-y-1 mt-2">
+          <div>🔵 Aircraft → 🟢 Tank</div>
+          <div>🟢 Tank → 🔴 Missile</div>
+          <div>🔴 Missile → 🔵 Aircraft</div>
+        </div>
       </div>
-      <div class="rounded-xl border border-dark-border bg-dark-card p-5 text-center">
-        <div class="text-3xl font-bold text-dark-accent">🌏</div>
-        <div class="text-sm text-dark-muted mt-1">EN + VI</div>
-      </div>
-      <div class="rounded-xl border border-dark-border bg-dark-card p-5 text-center">
-        <div class="text-3xl font-bold text-dark-accent">Free</div>
-        <div class="text-sm text-dark-muted mt-1">100% Free</div>
+      <div class="rounded-xl border border-dark-border bg-dark-card p-5">
+        <h3 class="text-sm font-semibold text-dark-accent mb-3">🏆 Top Heroes (S3 Meta)</h3>
+        <div class="space-y-1.5 text-sm">
+          <div class="flex items-center gap-2">
+            <img src="/images/heroes/kimberly-portrait.webp" alt="Kimberly" class="w-6 h-6 rounded-full" />
+            <span class="text-white">Kimberly</span>
+            <span class="text-xs text-dark-accent ml-auto">SS</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="/images/heroes/dva-portrait.webp" alt="DVA" class="w-6 h-6 rounded-full" />
+            <span class="text-white">DVA</span>
+            <span class="text-xs text-dark-accent ml-auto">SS</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="/images/heroes/tesla-portrait.webp" alt="Tesla" class="w-6 h-6 rounded-full" />
+            <span class="text-white">Tesla</span>
+            <span class="text-xs text-dark-accent ml-auto">SS</span>
+          </div>
+          <a href="/en/guides/hero-tier-list/" class="text-xs text-dark-accent hover:underline block mt-2">View full tier list →</a>
+        </div>
       </div>
     </div>
   </section>
+
 </BaseLayout>
