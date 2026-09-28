@@ -12,6 +12,9 @@ export async function getStaticPaths() {
 
 const { guide } = Astro.props;
 const { Content } = await guide.render();
+
+const wordCount = guide.body ? guide.body.split(/\s+/).length : 0;
+const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 ---
 
 <BaseLayout title={guide.data.title} description={guide.data.description} lang="en">
@@ -24,23 +27,46 @@ const { Content } = await guide.render();
       <span class="text-dark-accent">{guide.data.title}</span>
     </nav>
 
-    <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-4">{guide.data.title}</h1>
+    <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-6">{guide.data.title}</h1>
+
+    <div class="flex items-center gap-4 mb-8 p-4 rounded-xl bg-dark-card border border-dark-border shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-dark-accent/10 flex items-center justify-center text-dark-accent font-bold border border-dark-accent/20">
+          LW
+        </div>
+        <div>
+          <div class="text-white font-medium text-sm">Last War Team</div>
+          <div class="flex items-center gap-3 text-xs text-dark-muted mt-1">
+            {guide.data.lastUpdated && (
+              <span class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                {guide.data.lastUpdated}
+              </span>
+            )}
+            <span class="flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              {readingTime} min read
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     {guide.data.description && (
-      <p class="text-dark-muted text-lg mb-6">{guide.data.description}</p>
+      <p class="text-dark-muted text-lg mb-8 leading-relaxed">{guide.data.description}</p>
     )}
 
     {guide.data.tags && guide.data.tags.length > 0 && (
-      <div class="flex flex-wrap gap-2 mb-8">
+      <div class="flex flex-wrap gap-2 mb-10">
         {guide.data.tags.map((tag: string) => (
-          <span class="rounded-full bg-dark-card border border-dark-border px-3 py-1 text-xs text-dark-muted">
+          <span class="rounded-full bg-dark-bg border border-dark-border px-3 py-1 text-xs text-dark-muted font-medium hover:border-dark-accent transition-colors">
             {tag}
           </span>
         ))}
       </div>
     )}
 
-    <div class="prose prose-invert max-w-none">
+    <div class="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-a:text-dark-accent hover:prose-a:text-dark-accent-hover prose-img:rounded-xl">
       <Content />
     </div>
 
