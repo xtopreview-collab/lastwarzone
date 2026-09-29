@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import SquadBuilder from '../../../components/tools/SquadBuilder.tsx';
+---
+
+<BaseLayout title="Squad Builder - Last War" description="Build your perfect squad and calculate synergy buffs in Last War: Survival Game." lang="en">
+  <div class="max-w-4xl mx-auto py-8">
+    <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-4">Last War Squad Builder</h1>
+    <p class="text-dark-muted text-lg mb-10">
+      Select heroes to form your squad. The tool will automatically calculate the synergy buff based on your hero types (Tank, Aircraft, Missile).
+    </p>
+
+    <!-- Kích hoạt React Component với client:load -->
+    <SquadBuilder client:load />
+
+    <div class="mt-12 p-6 rounded-xl bg-dark-bg border border-dark-border">
+      <h3 class="text-xl font-bold text-white mb-4">How Synergy Buffs Work</h3>
+      <ul class="space-y-3 text-dark-muted">
+        <li><strong class="text-white">3 Same Type:</strong> +5% All Stats</li>
+        <li><strong class="text-white">3 Same + 2 Same (e.g. 3 Tank, 2 Aircraft):</strong> +10% All Stats</li>
+        <li><strong class="text-white">4 Same Type:</strong> +15% All Stats</li>
+        <li><strong class="text-white">5 Same Type:</strong> +20% All Stats</li>
+      </ul>
+      <p class="mt-4 text-sm italic">
+        *Tip: As a F2P player, your first major goal is a full 5-Tank squad (Murphy, Williams, Kimberly, Mason, Marshall).
+      </p>
+    </div>
+  </div>
+</BaseLayout>

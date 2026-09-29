@@ -1,0 +1,66 @@
+[
+  {
+    "id": "kimberly",
+    "name": "Kimberly",
+    "type": "Tank",
+    "rarity": "UR",
+    "position": "Back",
+    "avatarUrl": "/images/migrated/kimberly-portrait.png"
+  },
+  {
+    "id": "murphy",
+    "name": "Murphy",
+    "type": "Tank",
+    "rarity": "UR",
+    "position": "Front",
+    "avatarUrl": "/images/migrated/murphy-portrait.png"
+  },
+  {
+    "id": "mason",
+    "name": "Mason",
+    "type": "Tank",
+    "rarity": "SSR",
+    "position": "Back",
+    "avatarUrl": "/images/migrated/mason-portrait.png"
+  },
+  {
+    "id": "williams",
+    "name": "Williams",
+    "type": "Tank",
+    "rarity": "UR",
+    "position": "Front",
+    "avatarUrl": "/images/migrated/williams-portrait.png"
+  },
+  {
+    "id": "marshall",
+    "name": "Marshall",
+    "type": "Tank",
+    "rarity": "UR",
+    "position": "Back",
+    "avatarUrl": "/images/migrated/marshall-portrait.png"
+  },
+  {
+    "id": "dva",
+    "name": "DVA",
+    "type": "Aircraft",
+    "rarity": "UR",
+    "position": "Back",
+    "avatarUrl": "/images/migrated/dva-portrait.png"
+  },
+  {
+    "id": "carlie",
+    "name": "Carlie",
+    "type": "Aircraft",
+    "rarity": "UR",
+    "position": "Front",
+    "avatarUrl": "/images/migrated/carlie-portrait.png"
+  },
+  {
+    "id": "tesla",
+    "name": "Tesla",
+    "type": "Missile",
+    "rarity": "UR",
+    "position": "Back",
+    "avatarUrl": "/images/migrated/tesla-portrait.png"
+  }
+]
