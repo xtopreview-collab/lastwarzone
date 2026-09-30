@@ -4,57 +4,82 @@ import { getCollection } from 'astro:content';
 
 const allGuides = await getCollection('guides', ({ id }) => id.startsWith('en/'));
 
-const categoryMap: Record<string, { icon: string; name: string; guides: typeof allGuides }> = {
-  combat: { icon: '⚔️', name: 'Combat & PvP', guides: [] },
-  heroes: { icon: '🦸', name: 'Heroes', guides: [] },
-  buildings: { icon: '🏗️', name: 'Base Development', guides: [] },
-  gear: { icon: '🛡️', name: 'Gear & Equipment', guides: [] },
-  resources: { icon: '💎', name: 'Resources', guides: [] },
-  seasons: { icon: '🏆', name: 'Seasons & Events', guides: [] },
-  decorations: { icon: '🏛️', name: 'Decorations', guides: [] },
-};
-
-allGuides.forEach((guide) => {
-  const cat = guide.data.category || 'combat';
-  if (categoryMap[cat]) {
-    categoryMap[cat].guides.push(guide);
+// Group guides by category
+const groupedGuides = allGuides.reduce((acc, guide) => {
+  const category = guide.data.category || 'Uncategorized';
+  if (!acc[category]) {
+    acc[category] = [];
   }
+  acc[category].push(guide);
+  return acc;
+}, {} as Record<string, typeof allGuides>);
+
+// Define the ideal display order for categories
+const categoryOrder = [
+  'General Guides',
+  'Heroes Database',
+  'Tools & Calculators',
+  'Pre-Season 1',
+  'Season 1',
+  'Season 2',
+  'Season 3',
+  'Season 4',
+  'Season 5',
+  'Season 6'
+];
+
+// Sort categories based on predefined order
+const sortedCategories = Object.keys(groupedGuides).sort((a, b) => {
+  const indexA = categoryOrder.indexOf(a);
+  const indexB = categoryOrder.indexOf(b);
+  if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+  if (indexA === -1) return 1;
+  if (indexB === -1) return -1;
+  return indexA - indexB;
 });
 ---
 
-<BaseLayout title="All Guides" lang="en">
-  <h1 class="text-3xl font-bold text-white mb-8">📚 All Guides</h1>
+<BaseLayout title="All Guides - Last War Vault Clone" description="Browse all 260+ guides for Last War: Survival Game." lang="en">
+  <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h1 class="text-4xl md:text-6xl font-black text-white tracking-tight mb-6">Last War Library</h1>
+      <p class="text-xl text-dark-muted max-w-3xl mx-auto">Explore {allGuides.length} comprehensive guides, tier lists, and strategies for Last War: Survival Game.</p>
+    </div>
 
-  {Object.entries(categoryMap).map(([catId, cat]) => (
-    cat.guides.length > 0 && (
-      <section id={catId} class="mb-12">
-        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
-          <span>{cat.icon}</span>
-          <span>{cat.name}</span>
-          <span class="text-sm font-normal text-dark-muted">({cat.guides.length})</span>
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {cat.guides.sort((a, b) => a.data.order - b.data.order).map((guide) => {
-            const slug = guide.id.replace('en/', '').replace('.md', '').replace(/_/g, '-');
-            return (
-              <a
-                href={`/en/guides/${slug}/`}
-                class="group flex items-center gap-3 rounded-lg border border-dark-border bg-dark-card px-4 py-3 hover:border-dark-accent transition-all"
-              >
-                <span class="text-dark-accent">▸</span>
-                <div>
-                  <h3 class="font-medium text-white group-hover:text-dark-accent transition-colors text-sm">
-                    {guide.data.title}
-                  </h3>
-                  {guide.data.description && (
-                    <p class="text-xs text-dark-muted mt-0.5 line-clamp-1">{guide.data.description}</p>
-                  )}
+    <div class="space-y-20">
+      {sortedCategories.map(category => (
+        <section>
+          <div class="border-b border-dark-border pb-4 mb-8">
+            <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+              <span class="text-dark-accent">#</span> {category}
+              <span class="text-sm font-normal text-dark-muted bg-dark-card px-3 py-1 rounded-full ml-3 border border-dark-border">
+                {groupedGuides[category].length} Guides
+              </span>
+            </h2>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {groupedGuides[category].map(guide => (
+              <a href={`/en/guides/${guide.id.replace('en/', '').replace('.md', '').replace(/_/g, '-')}`} 
+                 class="group block bg-dark-card border border-dark-border rounded-2xl p-6 hover:border-dark-accent hover:bg-dark-bg transition-all duration-300 shadow-sm hover:shadow-md hover:shadow-dark-accent/10 flex flex-col h-full relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-dark-accent to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                
+                <h3 class="text-lg font-bold text-white group-hover:text-dark-accent transition-colors mb-3 line-clamp-2">
+                  {guide.data.title}
+                </h3>
+                <p class="text-sm text-dark-muted line-clamp-3 mb-6 flex-grow">
+                  {guide.data.description || 'Comprehensive strategy and analysis for Last War: Survival Game.'}
+                </p>
+                
+                <div class="flex items-center justify-between text-xs font-medium mt-auto pt-4 border-t border-dark-border/50">
+                  <span class="text-dark-accent">Read Guide &rarr;</span>
+                  <span class="text-dark-muted">{guide.data.pubDate}</span>
                 </div>
               </a>
-            );
-          })}
-        </div>
-      </section>
-    )
-  ))}
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
 </BaseLayout>
